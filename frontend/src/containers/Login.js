@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { login } from '../actions/auth';
+import React, { useState } from "react";
+import { Link, Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { login } from "../actions/auth";
+import axios from "axios";
 
 const Login = ({ login, isAuthenticated }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const { email, password } = formData;
@@ -18,6 +19,15 @@ const Login = ({ login, isAuthenticated }) => {
     e.preventDefault();
 
     login(email, password);
+  };
+
+  const continueWithGoogle = async () => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_API_URL}/auth/o/google-oauth2/?redirect_uri=${process.env.REACT_APP_API_URL}`
+      );
+      window.location.replace(res.data.authorization_url);
+    } catch (err) {}
   };
 
   if (isAuthenticated) return <Redirect to="/" />;
@@ -54,6 +64,11 @@ const Login = ({ login, isAuthenticated }) => {
           Login
         </button>
       </form>
+
+      <button className="btn btn-danger mt-2" onClick={continueWithGoogle}>
+        Continue with Google
+      </button>
+
       <p className="mt-3">
         Don't have an account? <Link to="/signup">Sign Up</Link>
       </p>
